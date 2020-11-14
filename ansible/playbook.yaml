@@ -1,0 +1,66 @@
+- name: Initialize Jenkins
+  hosts: localhost
+  vars_files:
+    - files/jenkins-required.yaml
+  vars:
+    namespace: devops
+
+  tasks:
+    - name: Install Openshift Python Library
+      command: pip3 install openshift
+      delegate_to: localhost
+
+    - name: Install Ansible
+      become: true
+      apt:
+        name: ansible
+        state: present
+        update_cache: yes
+      delegate_to: localhost
+
+    - name: Install Ansible Galaxy Kubernetes
+      command: ansible-galaxy collection install community.kubernetes
+      delegate_to: localhost
+
+    - name: Add Jenkins CI Repo
+      community.kubernetes.helm_repository:
+        name: jenkinsci
+        repo_url: "https://charts.jenkins.io"
+      delegate_to: localhost
+
+    - name: Create namespace
+      community.kubernetes.k8s:
+        name: "{{ namespace }}"
+        api_version: v1
+        kind: namespace
+        state: present
+      delegate_to: localhost
+
+    - name: Copy Customization
+      copy:
+        src: ../jenkins-values.yaml
+        dest: /tmp/
+      delegate_to: localhost
+
+    - name: Copy Secrets and Roles Deployment
+      copy:
+        src: ../jenkins-required
+        dest: /tmp/
+      delegate_to: localhost
+
+    - name: Apply Jenkins Required Chart
+      command: >
+        helm install -n "{{ namespace }}" jenkins-required /tmp/jenkins-required
+        --set jenkins.namespace="{{ namespace }}"
+        --set jenkins.gitUser='{{ gitUser }}'
+        --set jenkins.gitToken='{{ gitToken }}'
+        --set jenkins.gitSSHkey='{{ gitSSHkey }}'
+        --set jenkins.user='{{ jenkinsUser }}'
+        --set jenkins.password='{{ jenkinsPassword }}'
+      delegate_to: localhost
+
+    - name: Apply Jenkins Chart
+      command: >
+        helm install --namespace "{{ namespace }}" jenkins jenkinsci/jenkins
+        -f /tmp/jenkins-values.yaml
+        --set jenkins.namespace="{{ namespace }}"
