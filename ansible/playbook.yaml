@@ -61,6 +61,7 @@
 
     - name: Apply Jenkins Chart
       command: >
-        helm install --namespace "{{ namespace }}" jenkins jenkinsci/jenkins
+        helm install -n "{{ namespace }}" jenkins jenkinsci/jenkins
         -f /tmp/jenkins-values.yaml
         --set jenkins.namespace="{{ namespace }}"
+      delegate_to: localhost
