@@ -534,7 +534,7 @@ controller:
   updateStrategy: {}
 
   ingress:
-    enabled: true
+    enabled: false
     # Override for the default paths that map requests to the backend
     paths: []
     # - backend:
@@ -909,7 +909,7 @@ networkPolicy:
 ## Install Default RBAC roles and bindings
 rbac:
   create: true
-  readSecrets: false
+  readSecrets: true
 
 serviceAccount:
   create: true
