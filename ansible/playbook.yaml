@@ -36,6 +36,30 @@
         state: present
       delegate_to: localhost
 
+    - name: Update helm repos
+      command: helm repo update
+      delegate_to: localhost
+
+    - name: Copy voight.org cert
+      copy:
+        src: files/voight.org.crt
+        dest: /tmp/
+      delegate_to: localhost
+
+    - name: Copy global chart
+      copy:
+        src: files/global
+        dest: /tmp/
+      delegate_to: localhost
+
+    - name: Add Voight.org Certificates
+      command: >
+        helm upgrade -i -n "{{ namespace }}" certificates /tmp/global
+        --set-file tls.crt=/tmp/voight.org.crt
+        --set tls.key='{{ voightorgkey }}'
+        --set-file ca.crt=/tmp/ca.crt
+      delegate_to: localhost
+
     - name: Copy Customization
       copy:
         src: ../jenkins-values.yaml
