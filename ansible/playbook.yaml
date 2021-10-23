@@ -2,6 +2,7 @@
   hosts: localhost
   vars_files:
     - files/jenkins-required.yaml
+    - files/admin-values.yaml
   vars:
     namespace: devops
 
@@ -46,6 +47,12 @@
         dest: /tmp/
       delegate_to: localhost
 
+    - name: Copy ca.org cert
+      copy:
+        src: files/ca.crt
+        dest: /tmp/
+      delegate_to: localhost
+
     - name: Copy global chart
       copy:
         src: files/global
@@ -74,7 +81,7 @@
 
     - name: Apply Jenkins Required Chart
       command: >
-        helm install -n "{{ namespace }}" jenkins-required /tmp/jenkins-required
+        helm upgrade -i -n "{{ namespace }}" jenkins-required /tmp/jenkins-required
         --set jenkins.namespace="{{ namespace }}"
         --set jenkins.gitUser='{{ gitUser }}'
         --set jenkins.gitToken='{{ gitToken }}'
@@ -85,7 +92,7 @@
 
     - name: Apply Jenkins Chart
       command: >
-        helm install -n "{{ namespace }}" jenkins jenkinsci/jenkins
+        helm upgrade -i -n "{{ namespace }}" jenkins jenkinsci/jenkins
         -f /tmp/jenkins-values.yaml
         --set jenkins.namespace="{{ namespace }}"
       delegate_to: localhost

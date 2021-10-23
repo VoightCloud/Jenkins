@@ -1,37 +1,64 @@
-#kind: Role
-#apiVersion: rbac.authorization.k8s.io/v1
-#metadata:
-#  name: jenkins
-#rules:
-#  - apiGroups: [""]
-#    resources: ["pods"]
-#    verbs: ["create","delete","get","list","patch","update","watch"]
-#  - apiGroups: [""]
-#    resources: ["pods/exec"]
-#    verbs: ["create","delete","get","list","patch","update","watch"]
-#  - apiGroups: [""]
-#    resources: ["pods/log"]
-#    verbs: ["get","list","watch"]
-#  - apiGroups: [""]
-#    resources: ["secrets"]
-#    verbs: ["get","watch","list"]
-#  - apiGroups: [""]
-#    resources: ["configmaps"]
-#    verbs: ["get","watch","list"]
-#---
-#apiVersion: rbac.authorization.k8s.io/v1
-#kind: RoleBinding
-#metadata:
-#  name: jenkins
-#  namespace: {{ .Values.jenkins.namespace }}
-#roleRef:
-#  apiGroup: rbac.authorization.k8s.io
-#  kind: Role
-#  name: jenkins
-#subjects:
-#  - kind: ServiceAccount
-#    name: jenkins
-#---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: jenkins-build
+  namespace: build
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: jenkins-build
+  namespace: build
+rules:
+  - apiGroups: [""]
+    resources: ["namespaces", "roles", "pods", "services", "pods/log", "serviceaccounts", "pods/exec", "secrets", "configmaps"]
+    verbs: ["create","delete","get","list","patch","update","watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments","statefulsets"]
+    verbs: ["create","delete","get","list","patch","update","watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: jenkins-build
+  namespace: build
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: jenkins-build
+subjects:
+  - kind: ServiceAccount
+    name: jenkins-build
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: jenkins-build
+rules:
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["clusterroles", "clusterrolebindings"]
+    verbs: ["create","delete","get","list","patch","update","watch"]
+  - apiGroups: ["authorization.k8s.io"]
+    resources: ["tokenreviews", "subjectaccessreviews"]
+    verbs: ["create","delete","get","list","patch","update","watch"]
+  - apiGroups: ["admissionregistration.k8s.io"]
+    resources: ["mutatingwebhookconfigurations"]
+    verbs: ["create","delete","get","list","patch","update","watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: jenkins-build
+subjects:
+  - kind: ServiceAccount
+    name: jenkins-build
+    namespace: build
+    apiGroup: ""
+roleRef:
+  kind: ClusterRole
+  name: jenkins-build
+  apiGroup: rbac.authorization.k8s.io
+
 ##kind: StorageClass
 ##apiVersion: storage.k8s.io/v1
 ##metadata:
