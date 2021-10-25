@@ -1,7 +1,7 @@
 - name: Initialize Kubernetes Control Plane
   hosts: localhost
   vars_files:
-    - files/jenkins-required.yaml
+    - jenkins/files/jenkins-required.yaml
   vars:
     namespace: devops
 

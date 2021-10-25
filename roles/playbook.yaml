@@ -1,8 +1,8 @@
 - name: Initialize Jenkins
   hosts: localhost
   vars_files:
-    - files/jenkins-required.yaml
-    - files/admin-values.yaml
+    - jenkins/files/jenkins-required.yaml
+    - jenkins/files/admin-values.yaml
   vars:
     namespace: devops
 
@@ -43,19 +43,19 @@
 
     - name: Copy voight.org cert
       copy:
-        src: files/voight.org.crt
+        src: jenkins/files/voight.org.crt
         dest: /tmp/
       delegate_to: localhost
 
     - name: Copy ca.org cert
       copy:
-        src: files/ca.crt
+        src: jenkins/files/ca.crt
         dest: /tmp/
       delegate_to: localhost
 
     - name: Copy global chart
       copy:
-        src: files/global
+        src: jenkins/files/global
         dest: /tmp/
       delegate_to: localhost
 
