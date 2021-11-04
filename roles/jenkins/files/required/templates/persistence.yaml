@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jenkinsnfs
+spec:
+  capacity:
+    storage: 400Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: 192.168.137.3
+    path: "/volume1/Jenkins"
+  mountOptions:
+    - nfsvers=4.2
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jenkinsnfs
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 400Gi
+  selector:
+    matchLabels:
+      name: jenkinsnfs
