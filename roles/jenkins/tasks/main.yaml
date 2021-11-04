@@ -24,7 +24,7 @@
 - name: Apply Jenkins Required
   kubernetes.core.helm:
     name: "{{ deployment }}-required"
-    chart_ref: ../roles/common/files/required
+    chart_ref: ../roles/jenkins/files/required
     release_namespace: "{{ namespace }}"
     release_values:
       jenkins:
