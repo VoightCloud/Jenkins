@@ -1,4 +1,4 @@
-- name: Install Hashicorp Vault
+- name: Install Jenkins
   hosts: localhost
   connection: local
 

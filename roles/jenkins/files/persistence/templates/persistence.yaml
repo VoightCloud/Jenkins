@@ -1,29 +1,33 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: jenkinsnfs
+  name: jenkins-pv
+  namespace: devops
 spec:
   capacity:
     storage: 400Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
+  claimRef:
+    name: jenkins-pvc
+    namespace: devops
   nfs:
     server: 192.168.137.3
     path: "/volume1/Jenkins"
   mountOptions:
-    - nfsvers=4.2
+    - nfsvers=4.1
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: jenkinsnfs
+  name: jenkins-pvc
+  namespace: devops
 spec:
+  storageClassName: ""
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 400Gi
-  selector:
-    matchLabels:
-      name: jenkinsnfs
+  volumeName: "jenkins-pv"
