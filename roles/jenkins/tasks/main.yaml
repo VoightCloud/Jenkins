@@ -23,7 +23,7 @@
 
 - name: Apply Jenkins Persistence
   kubernetes.core.helm:
-    name: "{{ namespace }}-persistence"
+    name: "{{ deployment }}-persistence"
     chart_ref: ./roles/jenkins/files/persistence
     release_namespace: "{{ namespace }}"
 
