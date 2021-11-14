@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jenkins-pv
+  namespace: devops
+spec:
+  capacity:
+    storage: 400Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  claimRef:
+    name: jenkins-pvc
+    namespace: devops
+  iscsi:
+    chapAuthSession: false
+    chapAuthDiscovery: false
+    targetPortal: 192.168.137.3:3260
+    iqn: 'iqn.2000-01.com.synology:drive.jenkins.402fcc5ed94'
+    lun: 01
+    fsType: 'ext4'
+    readOnly: false
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jenkins-pvc
+  namespace: devops
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 400Gi
+  volumeName: "jenkins-pv"
